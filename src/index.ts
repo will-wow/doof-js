@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import PanTiltHAT from "pan-tilt-hat-2";
-import { Codec, StillCamera, StreamCamera } from "pi-camera-connect";
+import { Codec, StreamCamera } from "pi-camera-connect";
 // import nodejs bindings to native tensorflow
 import "@tensorflow/tfjs-node";
 
@@ -16,10 +16,15 @@ faceapi.env.monkeyPatch({ Canvas, Image, ImageData });
 async function main() {
   const panTilt = new PanTiltHAT();
 
+  // Reset position
   panTilt.pan(0);
+  panTilt.tilt(0);
 
   const streamCamera = new StreamCamera({
     codec: Codec.MJPEG,
+    width: 480,
+    height: 270,
+    fps: 10,
   });
 
   const canvas = createCanvas(480, 270);
@@ -34,7 +39,7 @@ async function main() {
 
   fs.writeFileSync("still-image.jpg", image);
 
-	console.log('captured image')
+  console.log("captured image");
 
   const loadedImage = await loadImage(image);
   ctx.drawImage(loadedImage, 0, 0, 480, 270);
@@ -45,7 +50,6 @@ async function main() {
   );
 
   console.log(detection);
-
 
   process.exit();
 }
