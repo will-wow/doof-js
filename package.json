@@ -24,8 +24,8 @@
   },
   "dependencies": {
     "@tensorflow/tfjs-node": "^4.12.0",
+    "@vladmandic/face-api": "^1.7.12",
     "canvas": "^2.11.2",
-    "face-api.js": "^0.22.2",
     "pan-tilt-hat-2": "github:RogerHardiman/node-pan-tilt-driver",
     "pi-camera-connect": "^0.3.4"
   }
