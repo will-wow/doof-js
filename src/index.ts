@@ -1,25 +1,31 @@
 import PanTiltHAT from "pan-tilt-hat-2";
 
-import { Stream } from "./stream";
-import { Detector } from "./detect";
+import { createCameraStream, createCanvasTransformer } from "./camera";
+import { createDetectionStream } from "./detect";
+import { Stream } from "stream";
 
 async function main() {
-  const panTilt = new PanTiltHAT();
+  const [cameraStream, transformCanvasToDetection] = await Promise.all([
+    createCameraStream(),
+    createDetectionStream(),
+  ]);
+  const transformToCanvas = createCanvasTransformer();
 
-  // Reset position
-  panTilt.pan(0);
-  panTilt.tilt(1);
+  const faceStream = cameraStream
+    .pipe(transformToCanvas)
+    .pipe(transformCanvasToDetection);
 
-  const stream = new Stream();
-  const detector = new Detector();
-
-  await Promise.all([stream.load(), detector.load()]);
-
-  stream.start(async (canvas) => {
-    detector.detect(canvas);
-  });
+  await awaitCloseStream(faceStream);
 
   process.exit();
 }
 
 main();
+
+function awaitCloseStream(stream: Stream): Promise<void> {
+  return new Promise<void>((resolve) => {
+    stream.on("close", function () {
+      resolve();
+    });
+  });
+}
